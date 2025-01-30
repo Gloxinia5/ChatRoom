@@ -177,6 +177,18 @@
     const socket = io();
     const messagesEl = document.getElementById('messages');
 
+    // Load username from localStorage
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+      document.getElementById('username').value = savedUsername;
+    }
+
+    // Save username to localStorage
+    document.getElementById('username').addEventListener('input', (e) => {
+      localStorage.setItem('username', e.target.value);
+    });
+
+    // Format timestamp
     function formatTime(date) {
       return new Date(date).toLocaleTimeString([], {
         hour: '2-digit',
@@ -184,11 +196,13 @@
       });
     }
 
+    // Handle message history
     socket.on('message_history', messages => {
       messages.forEach(msg => addMessageToDOM(msg));
       scrollToBottom();
     });
 
+    // Handle new messages
     socket.on('new_message', msg => {
       addMessageToDOM(msg);
       scrollToBottom();
@@ -196,7 +210,8 @@
 
     function addMessageToDOM(msg) {
       const li = document.createElement('li');
-      li.className = `message ${msg.username === document.getElementById('username').value ? 'self' : ''}`;
+      const currentUsername = localStorage.getItem('username');
+      li.className = `message ${msg.username === currentUsername ? 'self' : ''}`;
       
       li.innerHTML = `
         <div class="message-header">
@@ -228,6 +243,7 @@
       }
     }
 
+    // Send message on Enter key
     document.getElementById('messageInput').addEventListener('keypress', e => {
       if (e.key === 'Enter') sendMessage();
     });
