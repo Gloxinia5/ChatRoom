@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Chat Room</title>
+  <style>
+    body { max-width: 600px; margin: 0 auto; padding: 20px; }
+    #messages { list-style-type: none; margin: 0; padding: 0; }
+    #messages li { padding: 8px; background: #f0f0f0; margin: 5px 0; }
+    input { width: 80%; padding: 10px; }
+    button { width: 18%; padding: 10px; }
+  </style>
+</head>
+<body>
+  <ul id="messages"></ul>
+  <input id="messageInput" placeholder="Type a message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io(); // Connect to the server
+
+    // Handle incoming messages
+    socket.on('chat message', (msg) => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      document.getElementById('messages').appendChild(li);
+    });
+
+    // Send messages to the server
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      if (message) {
+        socket.emit('chat message', message);
+        input.value = '';
+      }
+    }
+
+    // Send message on Enter key
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
